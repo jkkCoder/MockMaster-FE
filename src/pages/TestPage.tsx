@@ -7,6 +7,7 @@ import { QuestionNavigation } from '../components/mock/QuestionNavigation';
 import { Timer } from '../components/common/Timer';
 import { Button } from '../components/common/Button';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { ConfirmModal } from '../components/common/ConfirmModal';
 import { getTotalQuestions, getAnsweredCount } from '../utils/helpers';
 import type { QuestionResponseDto } from '../utils/types';
 
@@ -20,6 +21,7 @@ export const TestPage: React.FC = () => {
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showTimeWarning, setShowTimeWarning] = useState(false);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
   const warningShownRef = useRef(false);
 
   // Get all questions in a flat array with section info
@@ -113,16 +115,14 @@ export const TestPage: React.FC = () => {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmitClick = () => {
+    setShowSubmitModal(true);
+  };
+
+  const handleSubmitConfirm = async () => {
     if (!currentAttempt || !attemptId) return;
 
-    const unansweredCount = totalQuestions - answeredCount;
-    if (unansweredCount > 0) {
-      const confirm = window.confirm(
-        `You have ${unansweredCount} unanswered question(s). Are you sure you want to submit?`
-      );
-      if (!confirm) return;
-    }
+    setShowSubmitModal(false);
 
     const answerArray = allQuestions.map((q) => ({
       questionId: q.id,
@@ -141,6 +141,10 @@ export const TestPage: React.FC = () => {
     } catch (error: any) {
       alert(error.response?.data?.message || 'Failed to submit test. Please try again.');
     }
+  };
+
+  const handleSubmitCancel = () => {
+    setShowSubmitModal(false);
   };
 
   if (loading && !currentAttempt) {
@@ -219,7 +223,7 @@ export const TestPage: React.FC = () => {
 
             {/* Submit Button */}
             <div className="mt-6 flex justify-center">
-              <Button variant="danger" size="lg" onClick={handleSubmit} isLoading={loading}>
+              <Button variant="danger" size="lg" onClick={handleSubmitClick} isLoading={loading}>
                 Submit Test
               </Button>
             </div>
@@ -237,6 +241,22 @@ export const TestPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Submit Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showSubmitModal}
+        title="Submit Test"
+        message={
+          totalQuestions - answeredCount > 0
+            ? `You have ${totalQuestions - answeredCount} unanswered question(s).\n\nAre you sure you want to submit your test? This action cannot be undone.`
+            : 'Are you sure you want to submit your test? This action cannot be undone.'
+        }
+        confirmText="Submit Test"
+        cancelText="Cancel"
+        onConfirm={handleSubmitConfirm}
+        onCancel={handleSubmitCancel}
+        variant="danger"
+      />
     </div>
   );
 };
