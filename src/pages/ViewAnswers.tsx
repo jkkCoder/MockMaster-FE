@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { mockService } from '../services/mock.service';
 import { Button } from '../components/common/Button';
@@ -13,6 +13,8 @@ export const ViewAnswers: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
+  const sectionContentRef = useRef<HTMLDivElement>(null);
+  const previousSectionIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     const fetchAnswers = async () => {
@@ -38,6 +40,17 @@ export const ViewAnswers: React.FC = () => {
   }, [mockId]);
 
   const selectedSection = data?.sections.find((s) => s.id === selectedSectionId);
+
+  // Scroll to top when section changes
+  useEffect(() => {
+    if (selectedSectionId && selectedSectionId !== previousSectionIdRef.current && sectionContentRef.current) {
+      // Only scroll if it's a different section (not initial load)
+      if (previousSectionIdRef.current !== null) {
+        sectionContentRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      previousSectionIdRef.current = selectedSectionId;
+    }
+  }, [selectedSectionId]);
 
   if (loading) {
     return (
@@ -147,7 +160,7 @@ export const ViewAnswers: React.FC = () => {
         {/* Main Content Area */}
         <div className="flex-1 px-4 sm:px-6 py-4 lg:py-6">
           {selectedSection ? (
-            <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+            <div ref={sectionContentRef} className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
               {/* Section Header */}
               <div className="border-b-2 border-blue-600 pb-2 mb-4">
                 <h2 className="text-lg sm:text-xl font-bold text-blue-900">
