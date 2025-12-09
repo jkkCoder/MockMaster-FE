@@ -47,7 +47,29 @@ export const AttemptDetails: React.FC = () => {
     if (selectedSectionId && selectedSectionId !== previousSectionIdRef.current && sectionContentRef.current) {
       // Only scroll if it's a different section (not initial load)
       if (previousSectionIdRef.current !== null) {
-        sectionContentRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Use setTimeout to ensure DOM has updated
+        setTimeout(() => {
+          if (sectionContentRef.current) {
+            const element = sectionContentRef.current;
+            // Get the absolute position of the element
+            let offsetTop = 0;
+            let currentElement: HTMLElement | null = element;
+            while (currentElement) {
+              offsetTop += currentElement.offsetTop;
+              currentElement = currentElement.offsetParent as HTMLElement | null;
+            }
+            
+            // Account for sticky headers: main header (~100px) + mobile section header (~60px) = ~160px on mobile
+            // On desktop, only main header (~100px)
+            const isMobile = window.innerWidth < 1024; // lg breakpoint
+            const headerOffset = isMobile ? 160 : 100;
+            
+            window.scrollTo({
+              top: offsetTop - headerOffset,
+              behavior: 'smooth'
+            });
+          }
+        }, 100);
       }
       previousSectionIdRef.current = selectedSectionId;
     }
