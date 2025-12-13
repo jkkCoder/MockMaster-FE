@@ -12,6 +12,7 @@ import { Results } from './pages/Results';
 import { ViewAnswers } from './pages/ViewAnswers';
 import { MyAttempts } from './pages/MyAttempts';
 import { AttemptDetails } from './pages/AttemptDetails';
+import { NotFound } from './pages/NotFound';
 
 const App: React.FC = () => {
   return (
@@ -96,7 +97,16 @@ const AppContent: React.FC = () => {
             </ProtectedRoute>
           }
         />
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route
+          path="*"
+          element={
+            isAuthenticated ? (
+              <NotFound />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
       </Routes>
     </div>
   );

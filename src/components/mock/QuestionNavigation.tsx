@@ -42,7 +42,14 @@ export const QuestionNavigation: React.FC<QuestionNavigationProps> = ({
   // Group by section
   const sectionsWithQuestions = sections.map((section) => {
     const startIndex = sectionQuestionMap.findIndex((item) => item.sectionId === section.id);
-    const endIndex = sectionQuestionMap.findLastIndex((item) => item.sectionId === section.id);
+    // Find last index manually since findLastIndex requires ES2023
+    let endIndex = -1;
+    for (let i = sectionQuestionMap.length - 1; i >= 0; i--) {
+      if (sectionQuestionMap[i].sectionId === section.id) {
+        endIndex = i;
+        break;
+      }
+    }
     return {
       ...section,
       startIndex,

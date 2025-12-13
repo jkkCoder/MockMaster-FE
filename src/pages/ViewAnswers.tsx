@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { mockService } from '../services/mock.service';
 import { Button } from '../components/common/Button';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
-import type { ViewAnswersResponseDto, QuestionResponseDto } from '../utils/types';
+import type { ViewAnswersResponseDto } from '../utils/types';
 import { IMAGE_BASE_URL } from '../utils/constants';
 
 export const ViewAnswers: React.FC = () => {

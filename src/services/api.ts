@@ -1,6 +1,8 @@
 import axios from 'axios';
 import type { AxiosError } from 'axios';
 import { API_BASE_URL, STORAGE_KEYS } from '../utils/constants';
+import { store } from '../store';
+import { logout } from '../store/slices/authSlice';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -29,9 +31,10 @@ api.interceptors.response.use(
   (error: AxiosError) => {
     if (error.response?.status === 401) {
       // Unauthorized - clear token and redirect to login
-      localStorage.removeItem(STORAGE_KEYS.TOKEN);
-      localStorage.removeItem(STORAGE_KEYS.USER);
-      window.location.href = '/login';
+      // Clear Redux state (this also clears localStorage)
+      store.dispatch(logout());
+      // Use replace instead of href to avoid adding to history
+      window.location.replace('/login');
     }
     return Promise.reject(error);
   }

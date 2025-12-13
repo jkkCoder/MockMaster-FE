@@ -8,7 +8,7 @@ import { Timer } from '../components/common/Timer';
 import { Button } from '../components/common/Button';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { ConfirmModal } from '../components/common/ConfirmModal';
-import { getTotalQuestions, getAnsweredCount } from '../utils/helpers';
+import { getAnsweredCount } from '../utils/helpers';
 import type { QuestionResponseDto } from '../utils/types';
 
 export const TestPage: React.FC = () => {

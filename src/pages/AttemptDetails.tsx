@@ -255,10 +255,6 @@ export const AttemptDetails: React.FC = () => {
               {/* Questions - Compact Layout */}
               <div className="space-y-5 sm:space-y-6">
                 {selectedSection.questions.map((question, questionIndex) => {
-                  const userSelectedOption = question.options.find((opt) => opt.id === question.userSelectedOptionId);
-                  const correctOption = question.options.find((opt) => opt.id === question.correctOptionId);
-                  const isUserCorrect = question.isCorrect;
-
                   return (
                     <div
                       key={question.id}
@@ -304,7 +300,6 @@ export const AttemptDetails: React.FC = () => {
                         {question.options.map((option) => {
                           const isUserSelected = option.id === question.userSelectedOptionId;
                           const isCorrect = option.isCorrect;
-                          const showCorrect = isCorrect && !isUserSelected; // Show tick if correct but not selected
 
                           let bgColor = 'bg-gray-50';
                           let borderColor = 'border-gray-200';
