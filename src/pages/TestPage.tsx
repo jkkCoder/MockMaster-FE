@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { selectAnswer, updateTimer, submitTest } from '../store/slices/testSlice';
+import { selectAnswer, updateTimer, submitTest, restoreTestFromStorageByAttemptId } from '../store/slices/testSlice';
+import { calculateRemainingTime } from '../utils/testStorage';
 import { QuestionCard } from '../components/mock/QuestionCard';
 import { QuestionNavigation } from '../components/mock/QuestionNavigation';
 import { Timer } from '../components/common/Timer';
@@ -23,6 +24,21 @@ export const TestPage: React.FC = () => {
   const [showTimeWarning, setShowTimeWarning] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const warningShownRef = useRef(false);
+  const hasRestoredRef = useRef(false);
+
+  // Restore test state from localStorage on mount if available
+  useEffect(() => {
+    if (attemptId && !currentAttempt && !hasRestoredRef.current) {
+      hasRestoredRef.current = true;
+      // Try to restore from localStorage
+      dispatch(restoreTestFromStorageByAttemptId({ attemptId }));
+      
+      // If still no attempt after restore, try to start a new test
+      // This handles the case where localStorage doesn't have the data
+      // Note: This might not work if the backend doesn't allow starting a test
+      // that's already in progress. In that case, we'd need a different API endpoint.
+    }
+  }, [attemptId, currentAttempt, dispatch]);
 
   // Get all questions in a flat array with section info
   const allQuestions: QuestionResponseDto[] = currentAttempt
@@ -47,18 +63,20 @@ export const TestPage: React.FC = () => {
   const answeredCount = getAnsweredCount(answers);
 
 
-  // Timer effect
+  // Timer effect - calculate remaining time from startTime and duration
   useEffect(() => {
-    if (!isTestActive) return;
+    if (!isTestActive || !currentAttempt) return;
 
-    let currentTimerValue = timer;
+    const startTime = new Date(currentAttempt.startedAt).getTime();
+    const duration = currentAttempt.duration;
 
     const interval = setInterval(() => {
-      currentTimerValue -= 1;
+      // Calculate remaining time on-the-fly from startTime and duration
+      const remaining = calculateRemainingTime(startTime, duration);
 
-      if (currentTimerValue <= 0) {
+      if (remaining <= 0) {
         // Auto-submit when time expires
-        if (currentAttempt && attemptId) {
+        if (attemptId) {
           const answerArray = allQuestions.map((q) => ({
             questionId: q.id,
             selectedOptionId: answers[q.id] || null,
@@ -68,7 +86,7 @@ export const TestPage: React.FC = () => {
             submitTest({
               attemptId,
               answers: answerArray,
-              timeTaken: currentAttempt.duration * 60,
+              timeTaken: duration * 60,
             })
           ).then((result: any) => {
             if (result.type.includes('fulfilled')) {
@@ -80,10 +98,10 @@ export const TestPage: React.FC = () => {
         return;
       }
 
-      dispatch(updateTimer(currentTimerValue));
+      dispatch(updateTimer(remaining));
 
       // Show warning at 5 minutes (300 seconds) - only once
-      if (currentTimerValue === 300 && !warningShownRef.current) {
+      if (remaining === 300 && !warningShownRef.current) {
         warningShownRef.current = true;
         setShowTimeWarning(true);
         alert('Warning: Only 5 minutes remaining!');
@@ -91,7 +109,7 @@ export const TestPage: React.FC = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isTestActive, timer, dispatch, attemptId, navigate, currentAttempt, allQuestions, answers]);
+  }, [isTestActive, currentAttempt, dispatch, attemptId, navigate, allQuestions, answers]);
 
 
   const handleSelectOption = (optionId: string | null) => {

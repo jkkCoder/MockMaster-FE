@@ -1,11 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { fetchMocks, setSelectedMock } from '../store/slices/mockSlice';
-import { startTest } from '../store/slices/testSlice';
+import { startTest, resetTest } from '../store/slices/testSlice';
 import { Button } from '../components/common/Button';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { Card } from '../components/common/Card';
+import { ResumeTestModal } from '../components/mock/ResumeTestModal';
+import { hasValidSavedAttempt, getRemainingTime, getSavedTestAttempt, clearSavedTestAttempt } from '../utils/testStorage';
 
 export const MockDetails: React.FC = () => {
   const { mockId } = useParams<{ mockId: string }>();
@@ -13,6 +15,8 @@ export const MockDetails: React.FC = () => {
   const dispatch = useAppDispatch();
   const { mocks, selectedMock, loading } = useAppSelector((state) => state.mock);
   const { loading: testLoading } = useAppSelector((state) => state.test);
+  const [showResumeModal, setShowResumeModal] = useState(false);
+  const [remainingTime, setRemainingTime] = useState(0);
 
   useEffect(() => {
     if (mocks.length === 0) {
@@ -36,13 +40,54 @@ export const MockDetails: React.FC = () => {
 
   const handleStartTest = async () => {
     if (!mockId) return;
-    
+
+    // Check if there's a valid saved attempt
+    if (hasValidSavedAttempt(mockId)) {
+      const remaining = getRemainingTime(mockId);
+      if (remaining !== null && remaining > 0) {
+        setRemainingTime(remaining);
+        setShowResumeModal(true);
+        return;
+      }
+    }
+
+    // No valid saved attempt, start new test
+    await startNewTest();
+  };
+
+  const startNewTest = async () => {
+    if (!mockId) return;
+
+    // Clear any existing saved attempt
+    clearSavedTestAttempt(mockId);
+    dispatch(resetTest());
+
     try {
       const result = await dispatch(startTest(mockId)).unwrap();
       navigate(`/test/${result.attemptId}`);
     } catch (error) {
       console.error('Failed to start test:', error);
     }
+  };
+
+  const handleResumeTest = async () => {
+    if (!mockId) return;
+
+    setShowResumeModal(false);
+    const saved = getSavedTestAttempt(mockId);
+    if (!saved) {
+      // If saved data is invalid, start new test
+      await startNewTest();
+      return;
+    }
+
+    // Navigate to the saved attemptId - TestPage will restore state from localStorage
+    navigate(`/test/${saved.attemptId}`);
+  };
+
+  const handleStartNewTest = async () => {
+    setShowResumeModal(false);
+    await startNewTest();
   };
 
   const handleViewAnswers = () => {
@@ -131,6 +176,14 @@ export const MockDetails: React.FC = () => {
           </div>
         </Card>
       </div>
+
+      {/* Resume Test Modal */}
+      <ResumeTestModal
+        isOpen={showResumeModal}
+        onResume={handleResumeTest}
+        onStartNew={handleStartNewTest}
+        remainingTime={remainingTime}
+      />
     </div>
   );
 };
