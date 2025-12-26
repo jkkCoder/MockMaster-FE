@@ -18,27 +18,37 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   onSelectOption,
   questionNumber,
   totalQuestions,
+  sectionName,
 }) => {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="mb-4">
-        <span className="text-sm font-medium text-gray-500">
-          Question {questionNumber} of {totalQuestions}
-        </span>
-        <div className="flex items-center gap-2 mt-1">
-          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-            {question.marks} mark{question.marks !== 1 ? 's' : ''}
-          </span>
+    <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 sm:p-8 border border-gray-100/50">
+      <div className="mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+          <div className="flex items-center gap-2 flex-wrap">
+            {sectionName && (
+              <span className="text-xs sm:text-sm font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-3 py-1.5 rounded-lg shadow-md">
+                {sectionName}
+              </span>
+            )}
+            <span className="text-sm font-semibold text-gray-600">
+              Question {questionNumber} of {totalQuestions}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 px-3 py-1.5 rounded-lg border border-blue-200">
+              {question.marks} mark{question.marks !== 1 ? 's' : ''}
+            </span>
           {question.negativeMark > 0 && (
             <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
               -{question.negativeMark} for wrong
             </span>
           )}
+          </div>
         </div>
       </div>
 
       {question.text && (
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 whitespace-pre-line">{question.text}</h3>
+        <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-6 leading-relaxed whitespace-pre-line">{question.text}</h3>
       )}
 
       {question.imageUrl && (

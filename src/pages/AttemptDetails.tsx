@@ -186,9 +186,9 @@ export const AttemptDetails: React.FC = () => {
               <button
                 key={section.id}
                 onClick={() => setSelectedSectionId(section.id)}
-                className={`flex-shrink-0 px-3 py-2 rounded-lg text-xs transition-colors whitespace-nowrap ${
+                className={`flex-shrink-0 px-3 py-2 rounded-xl text-xs transition-colors whitespace-nowrap ${
                   selectedSectionId === section.id
-                    ? 'bg-blue-600 text-white font-medium'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold shadow-md'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -217,9 +217,9 @@ export const AttemptDetails: React.FC = () => {
                   <button
                     key={section.id}
                     onClick={() => setSelectedSectionId(section.id)}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                    className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-colors ${
                       selectedSectionId === section.id
-                        ? 'bg-blue-600 text-white font-medium'
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold shadow-md'
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}
                   >
@@ -247,7 +247,7 @@ export const AttemptDetails: React.FC = () => {
             <div ref={sectionContentRef} className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
               {/* Section Header */}
               <div className="border-b-2 border-blue-600 pb-2 mb-4">
-                <h2 className="text-lg sm:text-xl font-bold text-blue-900">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900">
                   {data.sections.findIndex((s) => s.id === selectedSection.id) + 1}. {selectedSection.name}
                 </h2>
               </div>
@@ -282,7 +282,7 @@ export const AttemptDetails: React.FC = () => {
                               </div>
                             )}
                             <div className="flex gap-2 text-xs">
-                              <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
+                              <span className="bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 px-2 py-0.5 rounded-lg font-semibold border border-blue-200">
                                 {question.marks} mark{question.marks !== 1 ? 's' : ''}
                               </span>
                               {question.negativeMark > 0 && (

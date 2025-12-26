@@ -16,18 +16,18 @@ export const OptionButton: React.FC<OptionButtonProps> = ({
   return (
     <button
       onClick={onSelect}
-      className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+      className={`w-full text-left p-4 sm:p-5 rounded-xl border-2 transition-all duration-200 ${
         isSelected
-          ? 'border-blue-600 bg-blue-50'
-          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+          ? 'border-blue-500 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-md shadow-blue-200/50'
+          : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50/50'
       }`}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-4">
         <div
-          className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+          className={`flex-shrink-0 w-7 h-7 rounded-xl border-2 flex items-center justify-center transition-all ${
             isSelected
-              ? 'border-blue-600 bg-blue-600'
-              : 'border-gray-300'
+              ? 'border-blue-600 bg-gradient-to-br from-blue-600 to-indigo-600 shadow-md'
+              : 'border-gray-300 bg-white'
           }`}
         >
           {isSelected && (
@@ -41,8 +41,8 @@ export const OptionButton: React.FC<OptionButtonProps> = ({
           )}
         </div>
         <div className="flex-1">
-          <span className="font-semibold text-gray-800 mr-2">{option.label}.</span>
-          {option.text && <span className="text-gray-700 whitespace-pre-line">{option.text}</span>}
+          <span className="font-bold text-gray-900 mr-2 text-lg">{option.label}.</span>
+          {option.text && <span className="text-gray-700 whitespace-pre-line leading-relaxed">{option.text}</span>}
           {option.imageUrl && (
             <div className="mt-2">
               <img
