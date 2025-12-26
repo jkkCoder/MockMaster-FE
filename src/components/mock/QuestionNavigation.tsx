@@ -131,7 +131,9 @@ export const QuestionNavigation: React.FC<QuestionNavigationProps> = ({
           return (
             <div 
               key={section.id} 
-              ref={(el) => (sectionRefs.current[section.id] = el)}
+              ref={(el) => {
+                sectionRefs.current[section.id] = el;
+              }}
               className="mb-4 lg:mb-5 scroll-mt-4"
             >
               <h4 className={`text-xs lg:text-sm font-semibold mb-2 lg:mb-3 py-2 px-3 rounded-xl ${
