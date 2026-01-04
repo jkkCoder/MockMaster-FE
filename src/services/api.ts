@@ -30,11 +30,16 @@ api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
-      // Unauthorized - clear token and redirect to login
-      // Clear Redux state (this also clears localStorage)
-      store.dispatch(logout());
-      // Use replace instead of href to avoid adding to history
-      window.location.replace('/login');
+      const currentPath = window.location.pathname;
+      // Only redirect if we're not already on login/register pages
+      // This prevents page refresh on failed login attempts
+      if (currentPath !== '/login' && currentPath !== '/register') {
+        // Unauthorized - clear token and redirect to login
+        // Clear Redux state (this also clears localStorage)
+        store.dispatch(logout());
+        // Use replace instead of href to avoid adding to history
+        window.location.replace('/login');
+      }
     }
     return Promise.reject(error);
   }
